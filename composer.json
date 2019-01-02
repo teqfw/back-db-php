@@ -1,0 +1,20 @@
+{
+  "name": "teqfw/back-db-php",
+  "description": "Common database functionality (PHP)",
+  "homepage": "https://github.com/teqfw/back-db-php",
+  "license": "GPL-3.0-only",
+  "authors": [
+    {
+      "name": "Alex Gusev",
+      "email": "alex@flancer64.com"
+    }
+  ],
+  "require": {
+    "php": "^7.1"
+  },
+  "autoload": {
+    "psr-4": {
+      "TeqFw\\Lib\\Db": "src"
+    }
+  }
+}
