@@ -10,7 +10,9 @@
     }
   ],
   "require": {
-    "php": "^7.1"
+    "php": "^7.1",
+    "doctrine/dbal": "^2.5",
+    "teqfw/back-di-php": "dev-master"
   },
   "autoload": {
     "psr-4": {
