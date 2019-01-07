@@ -33,10 +33,16 @@ interface Entity
     public function create($data);
 
     /**
-     * Pathe to entity in DEM ("/path/to/entity").
+     * Path to entity in DEM ("/path/to/entity").
      * @return string
      */
     public function getEntityPath();
+
+    /**
+     * Class name for PHP data object corresponded to this repo.
+     * @return string
+     */
+    public function getEntityClass();
     /**
      * Delete one entity using primary key (or entity itself - PK will be extracted).
      *

@@ -7,7 +7,7 @@
 namespace TeqFw\Lib\Db\Api\Dao\Entity;
 
 
-class Base
+abstract class Base
     implements \TeqFw\Lib\Db\Api\Dao\Entity
 {
     /** @var \TeqFw\Lib\Db\Api\Dao\Generic */
@@ -25,8 +25,6 @@ class Base
 
     public function create($data)
     {
-        $entityName = static::ENTITY_NAME;
-        $entityNs = static::ENTITY_NS;
         $result = $this->generic->create($this, $data);
         return $result;
     }
@@ -41,10 +39,16 @@ class Base
         // TODO: Implement deleteSet() method.
     }
 
+    protected abstract function getEntityName();
+
+    public abstract function getEntityClass();
+
+    protected abstract function getEntityNamespace();
+
     public function getEntityPath()
     {
-        $name = static::ENTITY_NAME;
-        $ns = static::ENTITY_NS;
+        $name = $this->getEntityName();
+        $ns = $this->getEntityNamespace();
         $result = $this->hlpPath->normalizeRoot($name, $ns);
         return $result;
     }
@@ -56,7 +60,8 @@ class Base
 
     public function getSet($where = null, $bind = null, $order = null, $limit = null, $offset = null)
     {
-        // TODO: Implement getSet() method.
+        $result = $this->generic->getSet($this, $where, $bind, $order, $limit, $offset);
+        return $result;
     }
 
     public function updateOne($data)
