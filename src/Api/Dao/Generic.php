@@ -14,9 +14,9 @@ interface Generic
     /**
      * Create new entity.
      *
-     * @param string $entityName
+     * @param \TeqFw\Lib\Db\Api\Dao\Entity $repo
      * @param DataEntity $data
      * @return mixed
      */
-    public function create($entityName, $data);
+    public function create(\TeqFw\Lib\Db\Api\Dao\Entity $repo, $data);
 }

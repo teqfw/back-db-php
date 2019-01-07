@@ -33,6 +33,11 @@ interface Entity
     public function create($data);
 
     /**
+     * Pathe to entity in DEM ("/path/to/entity").
+     * @return string
+     */
+    public function getEntityPath();
+    /**
      * Delete one entity using primary key (or entity itself - PK will be extracted).
      *
      * @param DataEntity|array|int|string $pk

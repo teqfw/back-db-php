@@ -12,17 +12,22 @@ class Base
 {
     /** @var \TeqFw\Lib\Db\Api\Dao\Generic */
     private $generic;
+    /** @var \TeqFw\Lib\Dem\Api\Helper\Util\Path */
+    private $hlpPath;
 
     public function __construct(
-        \TeqFw\Lib\Db\Api\Dao\Generic $generic
+        \TeqFw\Lib\Db\Api\Dao\Generic $generic,
+        \TeqFw\Lib\Dem\Api\Helper\Util\Path $hlpPath
     ) {
         $this->generic = $generic;
+        $this->hlpPath = $hlpPath;
     }
 
     public function create($data)
     {
         $entityName = static::ENTITY_NAME;
-        $result = $this->generic->create($entityName, $data);
+        $entityNs = static::ENTITY_NS;
+        $result = $this->generic->create($this, $data);
         return $result;
     }
 
@@ -34,6 +39,14 @@ class Base
     public function deleteSet($where)
     {
         // TODO: Implement deleteSet() method.
+    }
+
+    public function getEntityPath()
+    {
+        $name = static::ENTITY_NAME;
+        $ns = static::ENTITY_NS;
+        $result = $this->hlpPath->normalizeRoot($name, $ns);
+        return $result;
     }
 
     public function getOne($pk)
@@ -55,5 +68,4 @@ class Base
     {
         // TODO: Implement updateSet() method.
     }
-
 }
