@@ -12,7 +12,9 @@
   "require": {
     "php": "^7.1",
     "doctrine/dbal": "^2.5",
-    "teqfw/back-di-php": "dev-master"
+    "teqfw/back-data-php": "dev-master",
+    "teqfw/back-di-php": "dev-master",
+    "zendframework/zend-db": "^2"
   },
   "autoload": {
     "psr-4": {
