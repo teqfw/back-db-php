@@ -33,17 +33,6 @@ interface Entity
     public function create($data);
 
     /**
-     * Path to entity in DEM ("/path/to/entity").
-     * @return string
-     */
-    public function getEntityPath();
-
-    /**
-     * Class name for PHP data object corresponded to this repo.
-     * @return string
-     */
-    public function getEntityClass();
-    /**
      * Delete one entity using primary key (or entity itself - PK will be extracted).
      *
      * @param DataEntity|array|int|string $pk
@@ -58,6 +47,25 @@ interface Entity
      * @return mixed
      */
     public function deleteSet($where);
+
+    /**
+     * Get permanent attributes names.
+     *
+     * @return string[]
+     */
+    public function getAttributes(): array;
+
+    /**
+     * Class name for PHP data object corresponded to this repo.
+     * @return string
+     */
+    public function getEntityClass();
+
+    /**
+     * Path to entity in DEM ("/path/to/entity").
+     * @return string
+     */
+    public function getEntityPath();
 
     /**
      * Get one entity using primary key.
