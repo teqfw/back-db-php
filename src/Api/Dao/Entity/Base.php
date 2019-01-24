@@ -7,6 +7,8 @@
 namespace TeqFw\Lib\Db\Api\Dao\Entity;
 
 
+use TeqFw\Lib\Db\Api\Dao\DataEntity;
+
 abstract class Base
     implements \TeqFw\Lib\Db\Api\Dao\Entity
 {
@@ -53,10 +55,12 @@ abstract class Base
         return $result;
     }
 
-    public function getOne($pk)
+    public function getOne($key)
     {
-        // TODO: Implement getOne() method.
+        $result = $this->generic->getOne($this, $key);
+        return $result;
     }
+
 
     public function getSet($where = null, $bind = null, $order = null, $limit = null, $offset = null)
     {

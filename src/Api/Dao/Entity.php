@@ -68,12 +68,19 @@ interface Entity
     public function getEntityPath();
 
     /**
-     * Get one entity using primary key.
+     * Get one entity using primary key or unique key.
      *
-     * @param $pk
+     * @param $key
      * @return DataEntity|null
      */
-    public function getOne($pk);
+    public function getOne($key);
+
+    /**
+     * Names of the primary key attributes.
+     *
+     * @return string[]
+     */
+    public function getPrimaryKey(): array;
 
     /**
      * Get entities according to given conditions.
