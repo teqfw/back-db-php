@@ -36,6 +36,7 @@ class Builder
     private function createConnectionQuery(\TeqFw\Lib\Db\Api\Data\Cfg\Db $cfg)
     {
         $configArray = [
+            'charset' => $cfg->charset,
             'driver' => $cfg->driver,
             'hostname' => $cfg->host,
             'database' => $cfg->dbname,
