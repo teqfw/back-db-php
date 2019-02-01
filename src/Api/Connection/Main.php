@@ -7,9 +7,10 @@
 namespace TeqFw\Lib\Db\Api\Connection;
 
 /**
- * Framework wrapper for database connection to perform schema related operations (Doctrine based).
+ * Framework wrapper for main database connection (Doctrine based). 80% of all applications require one database
+ * connection only. This connection.
  */
-class Schema
+class Main
     extends \Doctrine\DBAL\Connection
 {
 }

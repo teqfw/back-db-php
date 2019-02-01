@@ -52,10 +52,10 @@ class Builder
     {
         $config = new \Doctrine\DBAL\Configuration();
         $connectionParams = (array)$cfg;
-        $connectionParams['wrapperClass'] = \TeqFw\Lib\Db\Api\Connection\Schema::class;
+        $connectionParams['wrapperClass'] = \TeqFw\Lib\Db\Api\Connection\Main::class;
         /** @var  $conn */
         $conn = \Doctrine\DBAL\DriverManager::getConnection($connectionParams, $config);
-        $this->container->add(\TeqFw\Lib\Db\Api\Connection\Schema::class, $conn, true);
+        $this->container->add(\TeqFw\Lib\Db\Api\Connection\Main::class, $conn, true);
         $this->container->add(\Doctrine\DBAL\Connection::class, $conn, true);
         $this->container->add(\Doctrine\DBAL\Driver\Connection::class, $conn, true);
     }

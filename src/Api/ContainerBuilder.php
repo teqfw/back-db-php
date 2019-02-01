@@ -16,12 +16,12 @@ class ContainerBuilder
     ) {
         $cfg = $container->get(\TeqFw\Lib\Db\Api\Data\Cfg\Db::class);
         $connectionParams = (array)$cfg;
-        $connectionParams['wrapperClass'] = \TeqFw\Lib\Db\Api\Connection\Schema::class;
+        $connectionParams['wrapperClass'] = \TeqFw\Lib\Db\Api\Connection\Main::class;
 
         $config = new \Doctrine\DBAL\Configuration();
         /** @var  $conn */
         $conn = \Doctrine\DBAL\DriverManager::getConnection($connectionParams, $config);
-        $container->add(\TeqFw\Lib\Db\Api\Connection\Schema::class, $conn, true);
+        $container->add(\TeqFw\Lib\Db\Api\Connection\Main::class, $conn, true);
         $container->add(\Doctrine\DBAL\Connection::class, $conn, true);
         $container->add(\Doctrine\DBAL\Driver\Connection::class, $conn, true);
     }
