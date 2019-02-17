@@ -14,7 +14,8 @@
     "doctrine/dbal": "^2.5",
     "teqfw/back-data-php": "dev-master",
     "teqfw/back-di-php": "dev-master",
-    "zendframework/zend-db": "^2"
+    "zendframework/zend-db": "^2",
+    "zeptech/annotations": "^1"
   },
   "autoload": {
     "psr-4": {
