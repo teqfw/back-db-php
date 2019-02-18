@@ -154,6 +154,13 @@ class Anno
         }
         if (is_array($bind))
             $qb->setParameters($bind);
+        if (is_array($order)) {
+            foreach ($order as $field => $direction) {
+                $qb->orderBy($field, $direction);
+            }
+        }
+        if ($limit)
+            $qb->setMaxResults($limit);
         $sql = $qb->getSQL();
 
         /* execute query */
