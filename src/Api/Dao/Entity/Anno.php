@@ -15,6 +15,7 @@ class Anno
 {
     private const ANNO_COLUMN = 'column';
     private const ANNO_COLUMN_PROP_TYPE = 'type';
+    private const ANNO_ID = 'id';
     private const ANNO_TABLE = 'table';
     private const ANNO_TABLE_PROP_NAME = 'name';
     /**
@@ -33,6 +34,10 @@ class Anno
      * @var array [class][property]=>[annotations]
      */
     private $mapClassProps = [];
+    /**
+     * @var array [class]=>[attr1, attr2, ...]
+     */
+    private $mapClassToPrimaryKey = [];
     /**
      * @var array [class]=>[table_name]
      */
@@ -87,10 +92,9 @@ class Anno
         if (is_array($key)) {
             $bind = $key;
         } else {
-            /* TODO: get the first attribute from the key (probably, the one) */
-//            $pkey = $dao->getPrimaryKey();
-//            $first = reset($pkey);
-//            $bind[$first] = $key;
+            $pkey = $this->getPrimaryKey($class);
+            $first = reset($pkey);
+            $bind[$first] = $key;
         }
         /* compose query */
         $table = $this->getTableName($class);
@@ -114,6 +118,21 @@ class Anno
         return $result;
     }
 
+    /**
+     * Get array of the primary key attributes.
+     *
+     * @param string $class
+     * @return string[]
+     * @throws \Exception
+     */
+    private function getPrimaryKey($class)
+    {
+        if (!isset($this->mapClassToTable[$class])) {
+            $this->parseAnnotations($class);
+        }
+        return $this->mapClassToPrimaryKey[$class];
+    }
+
     public function getSet($class, $bind = null, $where = null, $order = null, $limit = null, $offset = null)
     {
         /* get set by KEY ($bind is the key, cause $where is null) */
@@ -133,7 +152,8 @@ class Anno
         foreach ($where as $one) {
             $qb->andWhere($one);
         }
-        $qb->setParameters($bind);
+        if (is_array($bind))
+            $qb->setParameters($bind);
         $sql = $qb->getSQL();
 
         /* execute query */
@@ -148,20 +168,7 @@ class Anno
     private function getTableName($class)
     {
         if (!isset($this->mapClassToTable[$class])) {
-            $refClass = new \ReflectionClass($class);
-            $annoClass = new \zpt\anno\Annotations($refClass);
-            $all = $annoClass->asArray();
-            if (isset($all[self::ANNO_TABLE][self::ANNO_TABLE_PROP_NAME])) {
-                $table = $all[self::ANNO_TABLE][self::ANNO_TABLE_PROP_NAME];
-                $this->mapClassToTable[$class] = $table;
-                foreach ($refClass->getProperties() as $refProp) {
-                    $propName = $refProp->name;
-                    $annoProp = new \zpt\anno\Annotations($refProp);
-                    $this->mapClassProps[$class][$propName] = $annoProp->asArray();
-                }
-            } else {
-                throw new \Exception("Class '$class' has no '@Table(name=...)' annotation.");
-            }
+            $this->parseAnnotations($class);
         }
         return $this->mapClassToTable[$class];
     }
@@ -185,6 +192,30 @@ class Anno
             }
         }
         return $result;
+    }
+
+    private function parseAnnotations($class)
+    {
+        $refClass = new \ReflectionClass($class);
+        $annoClass = new \zpt\anno\Annotations($refClass);
+        $all = $annoClass->asArray();
+        if (isset($all[self::ANNO_TABLE][self::ANNO_TABLE_PROP_NAME])) {
+            $table = $all[self::ANNO_TABLE][self::ANNO_TABLE_PROP_NAME];
+            $this->mapClassToTable[$class] = $table;
+            $pkey = [];
+            foreach ($refClass->getProperties() as $refProp) {
+                $propName = $refProp->name;
+                $annoProp = new \zpt\anno\Annotations($refProp);
+                $propAnnos = $annoProp->asArray();
+                $this->mapClassProps[$class][$propName] = $propAnnos;
+                if (isset($propAnnos[self::ANNO_ID])) {
+                    $pkey[] = $propName;
+                }
+            }
+            $this->mapClassToPrimaryKey[$class] = $pkey;
+        } else {
+            throw new \Exception("Class '$class' has no '@Table(name=...)' annotation.");
+        }
     }
 
     public function updateOne($data)
