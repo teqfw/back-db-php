@@ -57,11 +57,9 @@ class Anno
         $class = get_class($data);
         $table = $this->getTableName($class);
         $fields = (array)$data;
-        $norm = [];
-        foreach ($fields as $field => $value) {
-            $norm[$field] = $this->normalizeField($class, $field, $value);
-        }
-        $this->conn->insert($table, $norm);
+        $norm = $this->normalizeFields($class, $fields);
+        $withoutNullPK = $this->unsetPrimaryKeyNulls($class, $norm);
+        $this->conn->insert($table, $withoutNullPK);
         $result = $this->conn->lastInsertId();
         return $result;
     }
@@ -180,24 +178,33 @@ class Anno
         return $this->mapClassToTable[$class];
     }
 
-    private function normalizeField($class, $field, $value)
+    private function normalizeFields($class, $fields)
     {
-        $result = $value;
-        if (isset($this->mapClassProps[$class][$field][self::ANNO_COLUMN])) {
-            $anno = $this->mapClassProps[$class][$field][self::ANNO_COLUMN];
-            if (isset($anno[self::ANNO_COLUMN_PROP_TYPE])) {
-                $type = $anno[self::ANNO_COLUMN_PROP_TYPE];
-                if (
-                    (
-                        ($type == \Doctrine\DBAL\Types\Type::DATETIME) ||
-                        ($type == \Doctrine\DBAL\Types\Type::DATE)
-                    ) &&
-                    $value instanceof \DateTime
-                ) {
-                    $result = $value->format('Y-m-d H:i:s');
+        $result = [];
+        foreach ($fields as $field => $value) {
+            $normalized = $value;
+            if (isset($this->mapClassProps[$class][$field][self::ANNO_COLUMN])) {
+                $anno = $this->mapClassProps[$class][$field][self::ANNO_COLUMN];
+                if (isset($anno[self::ANNO_COLUMN_PROP_TYPE])) {
+                    $type = $anno[self::ANNO_COLUMN_PROP_TYPE];
+                    if (
+                        (
+                            ($type == \Doctrine\DBAL\Types\Type::DATETIME) ||
+                            ($type == \Doctrine\DBAL\Types\Type::DATE)
+                        ) &&
+                        $value instanceof \DateTime
+                    ) {
+                        $normalized = $value->format('Y-m-d H:i:s');
+                    } elseif (
+                    ($type == \Doctrine\DBAL\Types\Type::BOOLEAN)
+                    ) {
+                        $normalized = (int)$value;
+                    }
                 }
             }
+            $result[$field] = $normalized;
         }
+
         return $result;
     }
 
@@ -223,6 +230,19 @@ class Anno
         } else {
             throw new \Exception("Class '$class' has no '@Table(name=...)' annotation.");
         }
+    }
+
+    private function unsetPrimaryKeyNulls($class, $fields)
+    {
+        $result = [];
+        $pk = $this->mapClassToPrimaryKey[$class];
+        foreach ($fields as $name => $value) {
+            /* skip nulls in primary key fields */
+            if (in_array($name, $pk) && is_null($value))
+                continue;
+            $result[$name] = $value;
+        }
+        return $result;
     }
 
     public function updateOne($data)
