@@ -147,6 +147,8 @@ class Anno
         $qb = $this->conn->createQueryBuilder();
         $qb->select(self::SELECT_ALL);
         $qb->from($table, self::AS);
+        if (!is_null($where) && !is_array($where))
+            $where = [$where];
         foreach ($where as $one) {
             $qb->andWhere($one);
         }
