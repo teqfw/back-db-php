@@ -57,9 +57,11 @@ class Anno
         $class = get_class($data);
         $table = $this->getTableName($class);
         $fields = (array)$data;
-        $norm = $this->normalizeFields($class, $fields);
-        $withoutNullPK = $this->unsetPrimaryKeyNulls($class, $norm);
-        $this->conn->insert($table, $withoutNullPK);
+        $params = $this->normalizeFields($class, $fields);
+        [$columns, $values] = $this->prepareColumnsToInsert($class, $params);
+        $sql = 'INSERT INTO ' . $table . ' (' . implode(', ', $columns) . ')'
+            . ' VALUES (' . implode(', ', $values) . ')';
+        $this->conn->executeUpdate($sql, $params);
         $result = $this->conn->lastInsertId();
         return $result;
     }
@@ -234,17 +236,20 @@ class Anno
         }
     }
 
-    private function unsetPrimaryKeyNulls($class, $fields)
+    private function prepareColumnsToInsert($class, $fields)
     {
-        $result = [];
+        $columns = $value = [];
         $pk = $this->mapClassToPrimaryKey[$class];
         foreach ($fields as $name => $value) {
-            /* skip nulls in primary key fields */
-            if (in_array($name, $pk) && is_null($value))
-                continue;
-            $result[$name] = $value;
+            $columns[] = $name;
+            /* handle nulls in primary key fields (use expression on insert) */
+            if (in_array($name, $pk) && is_null($value)) {
+                $values[$name] = "DEFAULT";
+            } else {
+                $values[$name] = ":$name";
+            }
         }
-        return $result;
+        return [$columns, $values];
     }
 
     public function updateOne($data)
